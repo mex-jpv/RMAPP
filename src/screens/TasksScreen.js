@@ -6,8 +6,14 @@ import {
   View,
   Text,
   Image,
-  StyleSheet
+  StyleSheet,
+  ScrollView,
+  TouchableHighlight
 } from 'react-native';
+
+import TasksHeader from './../components/TasksHeader.js';
+import Task from './../components/TaskList.js';
+
 
 export default class TasksScreen extends Component<Props>{
 
@@ -27,80 +33,74 @@ export default class TasksScreen extends Component<Props>{
 
   }
 
-  render(){
-    return(
-      <View style={styles.container}>
+  updateTask(targetedId){
+    //Copiar el estado
+    let currentTask = [...this.state.tasks];
 
-        <View style={styles.headerContainer}>
-          <Image style={styles.userAvatar} source={require('./../images/user-avatar.png')}/>
-          <Text style={styles.pendingTasksText}>6 Pendientes</Text>
-          <Text style={styles.dateText}>SÁBADO 27 DE ENERO 2018</Text>
-        </View>
-
-        <View style={styles.tasksContainer}>
-
-          <View style={styles.taskContainer}>
-            <Image style={styles.taskIcon} source={require('./../images/icon-circle.png')}/>
-            <Text style={styles.taskText}>Ajustar Estilos</Text>
-          </View>
-
-          <View style={styles.taskContainer}>
-            <Image style={styles.taskIcon} source={require('./../images/icon-circle.png')}/>
-            <Text style={styles.taskText}>Ajustar Estilos</Text>
-          </View>
-
-        </View>
-      </View>
-    )
+    //Verificar el ID del que quiero cambiar
+    let taskToBeUpdated = currentTask.find( task=>task.id === targetedId );
+    //Checar en que estado esta y cambiarlo
+    taskToBeUpdated.completed = !taskToBeUpdated.completed;
+    //Actualizar el estado
+    this.setState( {task: currentTask} );
   }
+
+  calculateTaskToBeCompleted(){
+    let count = 0;
+    this.state.tasks.forEach(task =>{
+      if(!task.completed){
+        count++;
+      }
+    } );
+    return count;
+  }
+  renderTask(){
+    return (
+      this.state.tasks.map( (task) => {
+        return(
+            <Task key={task.id} task={task} updateTask={this.updateTask.bind(this)}/>
+        )
+      } )
+    )
+}
+
+
+render(){
+  return (
+    <View style={ styles.container }>
+      <TasksHeader toBeCompleted={this.calculateTaskToBeCompleted()}/>
+      <ScrollView style={ styles.tasksContainer }>{this.renderTask()}</ScrollView>
+      <TouchableHighlight style={styles.addTaskbutton}>
+        <Image style={styles.plusIcon} source={require('./../images/icon-plus.png')}/>
+      </TouchableHighlight>
+    </View>
+  )
+}
+
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  headerContainer: {
-    backgroundColor: 'blue',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  userAvatar: {
-    width: 130,
-    height: 130,
-    borderRadius: 65
-  },
-  pendingTasksText: {
-    fontSize: 36,
-    color: 'white',
-    marginTop: 25
-  },
-  dateText: {
-    fontSize: 16,
-    color: '#A0A0A0',
-    marginTop: 8
-  },
   tasksContainer: {
-    backgroundColor: 'green',
+    backgroundColor: 'white',
     flex: 1
   },
-  taskContainer: {
-    flex: 1,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderStyle: 'solid',
-    borderBottomWidth: 2,
-    borderColor: '#E7E7E7'
-
+  addTaskbutton:{
+    backgroundColor: '#ED184A',
+    width:66,
+    height:66,
+    borderRadius:33,
+    position: 'absolute',
+    bottom:20,
+    right:15,
+    alignItems:'center',
+    justifyContent:'center'
   },
-  taskIcon: {
-    width: 25,
-    height: 25,
-    marginRight: 15
-  },
-  taskText: {
-    fontSize: 21,
+  plusIcon:{
+    width:30,
+    height:30
   }
+
 });
