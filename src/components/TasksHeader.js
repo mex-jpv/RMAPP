@@ -26,7 +26,7 @@ generateDate(){
     date = currentDate.getDate();
 
 
-   return `${day} ${date} de ${month} ${year}`.toUpperCase;
+   return `${day} ${date} de ${month} ${year}`.toUpperCase();
 
 }
 
