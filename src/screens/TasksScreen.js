@@ -8,11 +8,13 @@ import {
   Image,
   StyleSheet,
   ScrollView,
-  TouchableHighlight
+  TouchableHighlight,
+  Modal
 } from 'react-native';
 
 import TasksHeader from './../components/TasksHeader.js';
 import Task from './../components/TaskList.js';
+import AddTaskModal from './../modals/AddTaskModal';
 
 
 export default class TasksScreen extends Component<Props>{
@@ -28,9 +30,37 @@ export default class TasksScreen extends Component<Props>{
         { id: 4, title: 'Organizar la peda', completed: false },
         { id: 5, title: 'Soportar la cruda', completed: false },
         { id: 6, title: 'Netflix and Chill', completed: false }
-      ]
+      ],
+      visibleModal: false
     }
 
+  }
+
+  showModal(){
+    this.setState( {visibleModal: true} )
+  }
+
+  hideModal(){
+      this.setState( {visibleModal: false} )
+  }
+
+  addTask(title){
+    //Obtener el valor del titulo
+
+    //Generar el objeto
+
+    //Generar el id que es una mala practica
+
+    //Setear la bandera de completado a falso por default
+    const id = 100 + this.state.tasks.length
+    const newTask = {id, title, completed:false };
+    //Copiar el arreglo Tasks Original
+     let tasks = [...this.state.tasks];
+    //Mandar la nueva tarea a la copia del arreglo
+     tasks.push(newTask);
+    //Actualizar el estado
+    this.setState( {tasks} );
+    this.hideModal();
   }
 
   updateTask(targetedId){
@@ -70,9 +100,18 @@ render(){
     <View style={ styles.container }>
       <TasksHeader toBeCompleted={this.calculateTaskToBeCompleted()}/>
       <ScrollView style={ styles.tasksContainer }>{this.renderTask()}</ScrollView>
-      <TouchableHighlight style={styles.addTaskbutton}>
+      <TouchableHighlight style={styles.addTaskbutton} onPress={()=> {this.showModal()}} >
         <Image style={styles.plusIcon} source={require('./../images/icon-plus.png')}/>
       </TouchableHighlight>
+      <Modal
+      animationType="slide"
+     transparent={true}
+     onRequestClose={()=>{this.hideModal()}}
+     visible={this.state.visibleModal}>
+       <AddTaskModal
+         addTask={this.addTask.bind(this)}
+         hideModal={this.hideModal.bind(this)}/>
+      </Modal>
     </View>
   )
 }
